@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:print_app/common/widgets/custom_appbar.dart';
 import 'package:print_app/common/widgets/custom_button.dart';
+import 'package:print_app/feature/admin/view/device_list.dart';
 import 'package:print_app/feature/print_cart/models/print_cart_model.dart';
 import 'package:print_app/feature/print_cart/widgets/print_cart_card.dart';
 import 'package:print_app/provider/main_provider.dart';
@@ -95,13 +98,17 @@ class _PrintCartViewState extends State<PrintCartView> {
                     var provider =
                         Provider.of<MainProvider>(context, listen: false);
                     if (provider.printCartList!.isNotEmpty) {
-                      provider.createHistoryData(
-                        context: context,
-                        printProductIds: provider.printCartList!
-                            .map((e) => e.id!)
-                            .toList(), // Ensure `id` is non-nullable if needed
-                        paymentMode: mode,
-                      );
+                      log("working");
+
+                      Navigator.pushNamed(context, DeviceListView.routeName,
+                          arguments: mode);
+                      // provider.createHistoryData(
+                      //   context: context,
+                      //   printProductIds: provider.printCartList!
+                      //       .map((e) => e.id!)
+                      //       .toList(), // Ensure `id` is non-nullable if needed
+                      //   paymentMode: mode,
+                      // );
                     } else {
                       showSnackBar(context, "Add items to print invoice");
                     }
@@ -143,7 +150,7 @@ class _PrintCartViewState extends State<PrintCartView> {
                     children: [
                       // List of cart items
                       Container(
-                        height: getDeviceHeight(context) * 0.55,
+                        height: getDeviceHeight(context) * 0.52,
                         child: ListView.builder(
                           itemCount: provider.printCartList!.length,
                           itemBuilder: (context, index) {
@@ -154,7 +161,7 @@ class _PrintCartViewState extends State<PrintCartView> {
                         ),
                       ),
                       Container(
-                        margin: const EdgeInsets.only(bottom: 20),
+                        margin: const EdgeInsets.only(bottom: 10),
                         width: getDeviceWidth(context),
                         height: 2,
                         color: AppColors.primary,
@@ -167,13 +174,13 @@ class _PrintCartViewState extends State<PrintCartView> {
                               const Text(
                                 'Total Quantity: ',
                                 style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
+                                    fontSize: 12, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 getTotalQuantity(provider).toString(),
                                 style: const TextStyle(
                                     color: AppColors.primary,
-                                    fontSize: 16,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.bold),
                               ),
                             ],
@@ -185,13 +192,13 @@ class _PrintCartViewState extends State<PrintCartView> {
                               const Text(
                                 'Total Amount: ',
                                 style: TextStyle(
-                                    fontSize: 16, fontWeight: FontWeight.bold),
+                                    fontSize: 12, fontWeight: FontWeight.bold),
                               ),
                               Text(
                                 "₹${getTotalAmount(provider).toStringAsFixed(2)}",
                                 style: const TextStyle(
                                     color: AppColors.primary,
-                                    fontSize: 16,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.bold),
                               ),
                             ],

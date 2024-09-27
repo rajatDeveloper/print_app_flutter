@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:print_app/feature/admin/view/device_list.dart';
 import 'package:print_app/feature/histroy/view/histroy_view.dart';
 import 'package:print_app/feature/main_bar_view.dart';
 import 'package:print_app/feature/print_cart/view/print_cart_view.dart';
@@ -24,6 +25,12 @@ Map<String, Widget Function(BuildContext)> getAppRoutes() {
     MainBarScreen.routeName: (context) {
       var index = ModalRoute.of(context)!.settings.arguments as int;
       return MainBarScreen(index: index);
+    },
+    DeviceListView.routeName: (context) {
+      String mode = ModalRoute.of(context)!.settings.arguments as String;
+      return DeviceListView(
+        mode: mode,
+      );
     },
   };
 

@@ -1,5 +1,6 @@
 // ignore_for_file: use_build_context_synchronously
 
+import 'package:bluetooth_print/bluetooth_print_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:print_app/feature/histroy/models/histroy_model.dart';
@@ -22,6 +23,8 @@ class MainProvider extends ChangeNotifier {
 
   //Histroy list
   List<HistroyModel>? histroyList;
+
+  //prinit data
 
   //function calls
 
