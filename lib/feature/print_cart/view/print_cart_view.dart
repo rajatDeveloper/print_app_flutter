@@ -1,9 +1,11 @@
 import 'dart:developer';
 
+import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart' as blue;
 import 'package:print_app/common/widgets/custom_appbar.dart';
 import 'package:print_app/common/widgets/custom_button.dart';
-import 'package:print_app/feature/admin/view/device_list.dart';
+
 import 'package:print_app/feature/print_cart/models/print_cart_model.dart';
 import 'package:print_app/feature/print_cart/widgets/print_cart_card.dart';
 import 'package:print_app/provider/main_provider.dart';
@@ -48,17 +50,88 @@ class _PrintCartViewState extends State<PrintCartView> {
   }
 
   String mode = "CASH";
+
+  // Future<void> _startPrint(
+  //     BluetoothDevice? device, List<PrintCartModel> data) async {
+  //   if (device != null) {
+  //     try {
+  //       await bluetoothPrint.connect(device);
+  //       showSnackBar(context, "Connected to device");
+  //       var isConnected = await bluetoothPrint.isConnected;
+  //       if (!isConnected!) {
+  //         // If not connected, attempt to connect
+  //         await bluetoothPrint.connect(device);
+  //       } else {
+  //         List<LineText> list = [];
+
+  //         // Add the header
+  //         list.add(LineText(
+  //           type: LineText.TYPE_TEXT,
+  //           content: "Food App",
+  //           weight: 2,
+  //           width: 2,
+  //           height: 2,
+  //           align: LineText.ALIGN_CENTER,
+  //           linefeed: 1,
+  //         ));
+
+  //         // // Add the order details
+  //         // for (var item in data) {
+  //         //   list.add(LineText(
+  //         //     type: LineText.TYPE_TEXT,
+  //         //     content: item.product!.name,
+  //         //     align: LineText.ALIGN_LEFT,
+  //         //     linefeed: 1,
+  //         //   ));
+
+  //         //   list.add(LineText(
+  //         //     type: LineText.TYPE_TEXT,
+  //         //     content:
+  //         //         "${f.format(item.product!.price)} x ${item.quantity} = ${f.format(double.parse(item.product!.price!) * item.quantity!)}",
+  //         //     align: LineText.ALIGN_LEFT,
+  //         //     linefeed: 1,
+  //         //   ));
+  //         // }
+
+  //         // // Add the total amount
+  //         // final totalAmount = data.fold(
+  //         //     0.0,
+  //         //     (total, item) =>
+  //         //         total + (double.parse(item.product!.price!) * item.quantity!));
+  //         // list.add(LineText(
+  //         //   type: LineText.TYPE_TEXT,
+  //         //   content: "Total: ${f.format(totalAmount)}",
+  //         //   align: LineText.ALIGN_CENTER,
+  //         //   linefeed: 1,
+  //         // ));
+
+  //         // Send the data to the printer
+  //         await bluetoothPrint.printReceipt({}, list);
+  //       }
+  //     } catch (e) {
+  //       log("Error while printing: $e");
+  //       showSnackBar(context, "Printing failed: ${e.toString()}");
+  //     }
+  //   }
+  // }
+
+  PrinterBluetoothManager bluetoothManager = PrinterBluetoothManager();
+
+  printData({
+    required MainProvider provider,
+  }) async {}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       bottomNavigationBar: Container(
-        padding: EdgeInsets.all(5),
+        padding: const EdgeInsets.all(5),
         margin: const EdgeInsets.only(top: 10, bottom: 10),
         child: Row(
           children: [
             Container(
-              margin: EdgeInsets.only(right: 5),
+              margin: const EdgeInsets.only(right: 5),
               width: getDeviceWidth(context) * 0.35,
               child: Container(
                   width: getDeviceWidth(context) * 0.9,
@@ -97,11 +170,19 @@ class _PrintCartViewState extends State<PrintCartView> {
                   onPressed: () {
                     var provider =
                         Provider.of<MainProvider>(context, listen: false);
+
                     if (provider.printCartList!.isNotEmpty) {
                       log("working");
 
-                      Navigator.pushNamed(context, DeviceListView.routeName,
-                          arguments: mode);
+                      if (provider.connectedDevice == null) {
+                        showSnackBar(context, "Connect to device first");
+                        return;
+                      }
+
+                      printData(provider: provider);
+
+                      //print recipt and hit api request
+
                       // provider.createHistoryData(
                       //   context: context,
                       //   printProductIds: provider.printCartList!

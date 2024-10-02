@@ -58,7 +58,7 @@ class _ProductCardState extends State<ProductCard> {
                       productId: widget.model.id!,
                       quantity: counter);
                   hideLoading(context);
-                  showSnackBar(context, "Item added to invoice");
+                  // showSnackBar(context, "Item added to invoice");
                 } catch (e) {
                   hideLoading(context);
                   showSnackBar(context, e.toString());

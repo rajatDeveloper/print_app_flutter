@@ -1,4 +1,7 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:print_app/feature/admin/view/device_list.dart';
 import 'package:print_app/res/colors.dart';
 import 'package:print_app/utils/use_full_function.dart';
 
@@ -46,12 +49,16 @@ class _CustomAppBarState extends State<CustomAppBar> {
         children: [
           IconButton(
             onPressed: () {
-              widget.isBackButton
-                  ? Navigator.of(context).pop()
-                  : Scaffold.of(context).openDrawer();
+              if (widget.isBackButton) {
+                Navigator.pop(context);
+              } else {
+                log("Working");
+                //Blue tooth screen
+                Navigator.pushNamed(context, DeviceList.routeName);
+              }
             },
             icon: Icon(
-              widget.isBackButton ? Icons.arrow_back_ios_new : Icons.menu,
+              widget.isBackButton ? Icons.arrow_back_ios_new : Icons.bluetooth,
               color: widget.isBackButton ? AppColors.black : AppColors.white,
             ),
           ),
