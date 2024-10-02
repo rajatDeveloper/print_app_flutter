@@ -1,10 +1,13 @@
 import 'dart:developer';
 
-import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
+// import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
+import 'package:blue_thermal_printer/blue_thermal_printer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart' as blue;
+
 import 'package:print_app/common/widgets/custom_appbar.dart';
 import 'package:print_app/common/widgets/custom_button.dart';
+import 'package:print_app/common/widgets/loader.dart';
+import 'package:print_app/feature/admin/models/test_print.dart';
 
 import 'package:print_app/feature/print_cart/models/print_cart_model.dart';
 import 'package:print_app/feature/print_cart/widgets/print_cart_card.dart';
@@ -115,11 +118,13 @@ class _PrintCartViewState extends State<PrintCartView> {
   //   }
   // }
 
-  PrinterBluetoothManager bluetoothManager = PrinterBluetoothManager();
-
+  // PrinterBluetoothManager bluetoothManager = PrinterBluetoothManager();
+  TestPrint testPrint = TestPrint();
   printData({
     required MainProvider provider,
-  }) async {}
+  }) async {
+    testPrint.printMainData(invoiceItem: provider.printCartList!, mode: mode);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -167,29 +172,36 @@ class _PrintCartViewState extends State<PrintCartView> {
               // width: getDeviceWidth(context) * 0.4,
               child: CustomElevatedBtn(
                   text: "Print",
-                  onPressed: () {
+                  onPressed: () async {
+                    BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
+                    bool isConnected = await bluetooth.isConnected ?? false;
                     var provider =
                         Provider.of<MainProvider>(context, listen: false);
-
-                    if (provider.printCartList!.isNotEmpty) {
+                    if (isConnected == false) {
+                      showSnackBar(context, 'Printer not connected');
+                      return;
+                    } else if (provider.printCartList!.isNotEmpty) {
                       log("working");
 
-                      if (provider.connectedDevice == null) {
-                        showSnackBar(context, "Connect to device first");
-                        return;
+                      try {
+                        // showLoading(context);
+                        await printData(provider: provider);
+
+                        //print recipt and hit api request
+
+                        provider.createHistoryData(
+                          context: context,
+                          printProductIds: provider.printCartList!
+                              .map((e) => e.id!)
+                              .toList(), // Ensure `id` is non-nullable if needed
+                          paymentMode: mode,
+                        );
+                        // hideLoading(context);
+                      } catch (e) {
+                        // hideLoading(context);
+                        showSnackBar(
+                            context, "Printing failed: ${e.toString()}");
                       }
-
-                      printData(provider: provider);
-
-                      //print recipt and hit api request
-
-                      // provider.createHistoryData(
-                      //   context: context,
-                      //   printProductIds: provider.printCartList!
-                      //       .map((e) => e.id!)
-                      //       .toList(), // Ensure `id` is non-nullable if needed
-                      //   paymentMode: mode,
-                      // );
                     } else {
                       showSnackBar(context, "Add items to print invoice");
                     }

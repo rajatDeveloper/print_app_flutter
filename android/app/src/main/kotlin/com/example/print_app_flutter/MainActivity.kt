@@ -1,4 +1,4 @@
-package com.example.print_app
+package com.example.print_app_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,3 +1,3 @@
 class AssetsData {
-  static const String splashImage = 'assets/images/splash.png';
+  static const String splashImage = 'assets/icons/logo.png';
 }

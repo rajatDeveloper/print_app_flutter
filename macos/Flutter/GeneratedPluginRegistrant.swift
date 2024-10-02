@@ -5,8 +5,8 @@
 import FlutterMacOS
 import Foundation
 
-import flutter_blue_plus
+import blue_thermal_printer
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
-  FlutterBluePlusPlugin.register(with: registry.registrar(forPlugin: "FlutterBluePlusPlugin"))
+  BlueThermalPrinterPlugin.register(with: registry.registrar(forPlugin: "BlueThermalPrinterPlugin"))
 }

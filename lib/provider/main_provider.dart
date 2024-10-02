@@ -1,9 +1,9 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
+// import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+// import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:print_app/feature/histroy/models/histroy_model.dart';
 import 'package:print_app/feature/histroy/service/histroy_service.dart';
 import 'package:print_app/feature/print_cart/models/print_cart_model.dart';
@@ -17,14 +17,14 @@ class MainProvider extends ChangeNotifier {
   //Product List
   List<ProductModel>? userProduct;
   List<ProductModel>? mainSearchedProduct;
-  ScanResult? connectedDevice;
+  // ScanResult? connectedDevice;
 
   //set connected device
 
-  void setConnectedDevice(ScanResult device) {
-    connectedDevice = device;
-    notifyListeners();
-  }
+  // void setConnectedDevice(ScanResult device) {
+  //   connectedDevice = device;
+  //   notifyListeners();
+  // }
 
   //print cart list
 

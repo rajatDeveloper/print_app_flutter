@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => MainProvider()),
       ],
       child: MaterialApp(
-        title: 'Flutter Demo',
+        title: 'KHANAURI JUNCTION',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),

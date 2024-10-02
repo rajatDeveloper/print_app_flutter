@@ -26,7 +26,7 @@ Map<String, Widget Function(BuildContext)> getAppRoutes() {
       var index = ModalRoute.of(context)!.settings.arguments as int;
       return MainBarScreen(index: index);
     },
-    DeviceList.routeName: (context) => const DeviceList(),
+    DeviceList.routeName: (context) => DeviceList(),
   };
 
   return appRoutes;
