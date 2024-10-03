@@ -5,7 +5,14 @@ import 'package:print_app/feature/print_cart/models/print_cart_model.dart';
 import 'package:print_app/printerenum.dart';
 
 class TestPrint {
-  BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
+  final BlueThermalPrinter bluetooth = BlueThermalPrinter.instance;
+
+  // Alignment and Size Constants
+  final int centerAlign = Align.center.val;
+  final int leftAlign = Align.left.val;
+  final int boldLarge = Size.boldLarge.val;
+  final int bold = Size.bold.val;
+  final int medium = Size.medium.val;
 
   // Method to calculate total quantity
   int _getTotalQuantity(List<PrintCartModel> printCartList) {
@@ -21,62 +28,55 @@ class TestPrint {
   }
 
   // Main print function
-  printMainData(
+  Future<void> printMainData(
       {required List<PrintCartModel> invoiceItem, required String mode}) async {
-    // Ensure Bluetooth is connected
+    // Check Bluetooth connection
     bool isConnected = await bluetooth.isConnected ?? false;
-    if (isConnected) {
-      // Print header
-      bluetooth.printCustom(
-          "KHANAURI JUNCTION", Size.boldLarge.val, Align.center.val);
-
-// PATRAN -NARWANA ROAD KHANAURI -148027
-      bluetooth.printCustom("PATRAN - NARWANA ROAD KHANAURI - 148027",
-          Size.medium.val, Align.center.val);
-      bluetooth.printLeftRight("Anil", "Ankit", Size.medium.val);
-      bluetooth.printLeftRight("8396833173", "7495014651", Size.medium.val);
-      bluetooth.printNewLine();
-
-      // Print invoice details (Product name, price, quantity)
-      for (var item in invoiceItem) {
-        bluetooth.printCustom(
-            "${item.product!.name}", Size.medium.val, Align.left.val);
-
-        bluetooth.printLeftRight(
-            "${item.quantity} x ${item.product!.price!} =",
-            "${(double.parse(item.product!.price!) * (item.quantity ?? 0)).toStringAsFixed(2)}",
-            Size.medium.val);
-      }
-      bluetooth.printNewLine();
-
-      // Print total quantity
-      final totalQuantity = _getTotalQuantity(invoiceItem);
-
-      bluetooth.printLeftRight(
-          "Total Quantity: ", "$totalQuantity", Size.bold.val);
-
-      bluetooth.printLeftRight("Mode: ", mode, Size.bold.val);
-
-      // Print total amount
-      final totalAmount = _getTotalAmount(invoiceItem);
-      bluetooth.printLeftRight(
-          "Total Amount: ", "${totalAmount.toStringAsFixed(2)}", Size.bold.val);
-      bluetooth.printNewLine();
-
-      // Optionally, print footer
-      bluetooth.printCustom(
-          "Thank you, Visit again", Size.bold.val, Align.center.val);
-      bluetooth.printNewLine();
-
-      // Optionally, print QR code
-      // bluetooth.printQRcode("Order Summary", 200, 200, Align.center.val);
-      // bluetooth.printNewLine();
-
-      // Optionally, cut paper
-      bluetooth.paperCut();
-    } else {
-      // Handle case when not connected
+    if (!isConnected) {
       print("Bluetooth is not connected");
+      return;
     }
+
+    // Print Header
+    bluetooth.printCustom("KHANAURI JUNCTION", boldLarge, centerAlign);
+    bluetooth.printCustom(
+        "PATRAN - NARWANA ROAD KHANAURI - 148027", medium, centerAlign);
+    bluetooth.printLeftRight("Anil", "Ankit", medium);
+    bluetooth.printLeftRight("8396833173", "7495014651", medium);
+    bluetooth.printNewLine();
+
+    // Print Invoice Items
+    for (var item in invoiceItem) {
+      bluetooth.printCustom("${item.product!.name}", medium, leftAlign);
+      bluetooth.printLeftRight(
+        "${item.quantity} x ${item.product!.price!} =",
+        "${(double.parse(item.product!.price!) * (item.quantity ?? 0)).toStringAsFixed(2)}",
+        medium,
+      );
+    }
+    bluetooth.printNewLine();
+
+    // Print Payment Mode
+    bluetooth.printLeftRight("Mode: ", mode, bold);
+
+    // Print Total Quantity
+    final totalQuantity = _getTotalQuantity(invoiceItem);
+    bluetooth.printLeftRight("Total Quantity: ", "$totalQuantity", bold);
+
+    // Print Total Amount
+    final totalAmount = _getTotalAmount(invoiceItem);
+    bluetooth.printLeftRight(
+        "Total Amount: ", totalAmount.toStringAsFixed(2), bold);
+    bluetooth.printNewLine();
+
+    // Footer
+    bluetooth.printCustom("Thank you, Visit again", bold, centerAlign);
+    bluetooth.printNewLine();
+
+    // Cut Paper (with delay to ensure paper holds)
+    bluetooth.paperCut();
+    await Future.delayed(
+        Duration(milliseconds: 500)); // Add delay before second cut
+    bluetooth.paperCut();
   }
 }
