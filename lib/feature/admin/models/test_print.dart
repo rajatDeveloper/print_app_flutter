@@ -13,6 +13,7 @@ class TestPrint {
   final int leftAlign = Align.left.val;
   final int boldLarge = Size.boldLarge.val;
   final int bold = Size.bold.val;
+
   final int medium = Size.medium.val;
 
   // Method to calculate total quantity
@@ -55,21 +56,16 @@ class TestPrint {
         "PATRAN - NARWANA ROAD KHANAURI - 148027", medium, centerAlign);
     bluetooth.printLeftRight("Anil: 8396833173", "Ankit: 7495014651", medium);
 
-    bluetooth.printNewLine();
     //Date
     bluetooth.printCustom(formatDate(), medium, centerAlign);
-
-    bluetooth.printNewLine();
 
     // Print Invoice Items
     for (var item in invoiceItem) {
       bluetooth.printCustom("${item.product!.name}", bold, leftAlign);
-      bluetooth.printLeftRight(
-        "${item.quantity} x ${item.product!.price!} =",
-        (double.parse(item.product!.price!) * (item.quantity ?? 0))
-            .toStringAsFixed(2),
-        bold,
-      );
+      bluetooth.printCustom(
+          "${item.quantity} x ${item.product!.price!} = ${(double.parse(item.product!.price!) * (item.quantity ?? 0)).toStringAsFixed(2)}",
+          bold,
+          leftAlign);
     }
     bluetooth.printNewLine();
 
