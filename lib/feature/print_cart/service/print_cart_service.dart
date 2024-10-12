@@ -125,11 +125,13 @@ class PrintCartService extends BaseService {
 
   Future<ApiResponse> createHistroyService(
       {required List<int> printProduuctCartIds,
-      required String payemtMode}) async {
+      required String payemtMode,
+      required int discount}) async {
     var data = {
       "date": DateTime.now().toString(),
       "payment_mode": payemtMode,
-      "print_cart": printProduuctCartIds
+      "print_cart": printProduuctCartIds,
+      "discount": discount
     };
     NetworkRequest request = NetworkRequest(
       "${ApiConstants.baseUrl}history/create/",

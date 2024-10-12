@@ -33,16 +33,33 @@ class TestPrint {
   }
 
   // Method to calculate total amount
-  double _getTotalAmount(List<PrintCartModel> printCartList) {
-    return printCartList.fold(
-        0.0,
-        (total, e) =>
-            total + ((e.quantity ?? 0) * (double.parse(e.product!.price!))));
+  double _getTotalAmount(List<PrintCartModel> printCartList, int discount) {
+    // Calculate total without discount
+    double total = printCartList.fold(
+            0.0,
+            (sum, e) =>
+                sum! +
+                ((e.quantity ?? 0) * (double.parse(e.product!.price!)))) ??
+        0.0;
+
+    // Apply discount
+    double discountAmount = (total * discount) / 100;
+
+    // Return the amount after applying the discount
+    return total - discountAmount;
   }
+  // double _getTotalAmount(List<PrintCartModel> printCartList) {
+  //   return printCartList.fold(
+  //       0.0,
+  //       (total, e) =>
+  //           total + ((e.quantity ?? 0) * (double.parse(e.product!.price!))));
+  // }
 
   // Main print function
   Future<void> printMainData(
-      {required List<PrintCartModel> invoiceItem, required String mode}) async {
+      {required List<PrintCartModel> invoiceItem,
+      required String mode,
+      required int discount}) async {
     // Check Bluetooth connection
     bool isConnected = await bluetooth.isConnected ?? false;
     if (!isConnected) {
@@ -77,9 +94,9 @@ class TestPrint {
     bluetooth.printLeftRight("Total Quantity: ", "$totalQuantity", bold);
 
     // Print Total Amount
-    final totalAmount = _getTotalAmount(invoiceItem);
-    bluetooth.printLeftRight(
-        "Total Amount: ", totalAmount.toStringAsFixed(2), bold);
+    final totalAmount = _getTotalAmount(invoiceItem, discount);
+    bluetooth.printLeftRight("Total Amount (Discount: $discount%): ",
+        totalAmount.toStringAsFixed(2), bold);
     bluetooth.printNewLine();
 
     // Footer

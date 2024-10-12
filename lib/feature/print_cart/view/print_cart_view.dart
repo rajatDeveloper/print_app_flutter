@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:developer';
 
 // import 'package:esc_pos_bluetooth/esc_pos_bluetooth.dart';
@@ -6,6 +8,7 @@ import 'package:flutter/material.dart';
 
 import 'package:print_app/common/widgets/custom_appbar.dart';
 import 'package:print_app/common/widgets/custom_button.dart';
+import 'package:print_app/common/widgets/custom_text_field.dart';
 import 'package:print_app/common/widgets/loader.dart';
 import 'package:print_app/feature/admin/models/test_print.dart';
 
@@ -25,16 +28,6 @@ class PrintCartView extends StatefulWidget {
 }
 
 class _PrintCartViewState extends State<PrintCartView> {
-  @override
-  void initState() {
-    super.initState();
-    // Fetch data after widget is built.
-    Future.delayed(Duration.zero, () {
-      var provider = Provider.of<MainProvider>(context, listen: false);
-      provider.getAllPrintCartData(context: context);
-    });
-  }
-
 // Method to calculate total quantity
   int getTotalQuantity(MainProvider provider) {
     return provider.printCartList
@@ -43,87 +36,56 @@ class _PrintCartViewState extends State<PrintCartView> {
   }
 
 // Method to calculate total amount
-  double getTotalAmount(MainProvider provider) {
-    return provider.printCartList?.fold(
+  double getTotalAmount(MainProvider provider, int discount) {
+    // Calculate total without discount
+    double total = provider.printCartList?.fold(
             0.0,
-            (total, e) =>
-                total! +
+            (sum, e) =>
+                sum! +
                 ((e.quantity ?? 0) * (double.parse(e.product!.price!)))) ??
         0.0;
+
+    // Apply discount
+    double discountAmount = (total * discount) / 100;
+
+    // Return the amount after applying the discount
+    return total - discountAmount;
   }
+
+  // double getTotalAmount(MainProvider provider, int discount) {
+  //   return provider.printCartList?.fold(
+  //           0.0,
+  //           (total, e) =>
+  //               total! +
+  //               ((e.quantity ?? 0) * (double.parse(e.product!.price!)))) ??
+  //       0.0;
+  // }
 
   String mode = "CASH";
 
-  // Future<void> _startPrint(
-  //     BluetoothDevice? device, List<PrintCartModel> data) async {
-  //   if (device != null) {
-  //     try {
-  //       await bluetoothPrint.connect(device);
-  //       showSnackBar(context, "Connected to device");
-  //       var isConnected = await bluetoothPrint.isConnected;
-  //       if (!isConnected!) {
-  //         // If not connected, attempt to connect
-  //         await bluetoothPrint.connect(device);
-  //       } else {
-  //         List<LineText> list = [];
+  TextEditingController discountController = TextEditingController();
+  FocusNode node = FocusNode();
 
-  //         // Add the header
-  //         list.add(LineText(
-  //           type: LineText.TYPE_TEXT,
-  //           content: "Food App",
-  //           weight: 2,
-  //           width: 2,
-  //           height: 2,
-  //           align: LineText.ALIGN_CENTER,
-  //           linefeed: 1,
-  //         ));
-
-  //         // // Add the order details
-  //         // for (var item in data) {
-  //         //   list.add(LineText(
-  //         //     type: LineText.TYPE_TEXT,
-  //         //     content: item.product!.name,
-  //         //     align: LineText.ALIGN_LEFT,
-  //         //     linefeed: 1,
-  //         //   ));
-
-  //         //   list.add(LineText(
-  //         //     type: LineText.TYPE_TEXT,
-  //         //     content:
-  //         //         "${f.format(item.product!.price)} x ${item.quantity} = ${f.format(double.parse(item.product!.price!) * item.quantity!)}",
-  //         //     align: LineText.ALIGN_LEFT,
-  //         //     linefeed: 1,
-  //         //   ));
-  //         // }
-
-  //         // // Add the total amount
-  //         // final totalAmount = data.fold(
-  //         //     0.0,
-  //         //     (total, item) =>
-  //         //         total + (double.parse(item.product!.price!) * item.quantity!));
-  //         // list.add(LineText(
-  //         //   type: LineText.TYPE_TEXT,
-  //         //   content: "Total: ${f.format(totalAmount)}",
-  //         //   align: LineText.ALIGN_CENTER,
-  //         //   linefeed: 1,
-  //         // ));
-
-  //         // Send the data to the printer
-  //         await bluetoothPrint.printReceipt({}, list);
-  //       }
-  //     } catch (e) {
-  //       log("Error while printing: $e");
-  //       showSnackBar(context, "Printing failed: ${e.toString()}");
-  //     }
-  //   }
-  // }
-
-  // PrinterBluetoothManager bluetoothManager = PrinterBluetoothManager();
   TestPrint testPrint = TestPrint();
   printData({
     required MainProvider provider,
   }) async {
-    testPrint.printMainData(invoiceItem: provider.printCartList!, mode: mode);
+    testPrint.printMainData(
+        invoiceItem: provider.printCartList!,
+        mode: mode,
+        discount: int.parse(discountController.text));
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Fetch data after widget is built.
+    Future.delayed(Duration.zero, () {
+      discountController.text = "0";
+      var provider = Provider.of<MainProvider>(context, listen: false);
+      provider.getAllPrintCartData(context: context);
+    });
   }
 
   @override
@@ -191,6 +153,9 @@ class _PrintCartViewState extends State<PrintCartView> {
 
                         provider.createHistoryData(
                           context: context,
+                          discount: int.parse(discountController.text == ""
+                              ? "0"
+                              : discountController.text),
                           printProductIds: provider.printCartList!
                               .map((e) => e.id!)
                               .toList(), // Ensure `id` is non-nullable if needed
@@ -241,9 +206,48 @@ class _PrintCartViewState extends State<PrintCartView> {
                 } else {
                   return Column(
                     children: [
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: getDeviceWidth(context) * 0.5,
+                            child: CustomTextField(
+                                borderActiveColor: AppColors.primary,
+                                controller: discountController,
+                                node: node,
+                                isNum: true,
+                                hintTextMain: "Enter discount in %"),
+                          ),
+                          SizedBox(
+                            width: getDeviceWidth(context) * 0.01,
+                          ),
+                          Expanded(
+                            // width: getDeviceWidth(context) * 0.4,
+                            child: CustomElevatedBtn(
+                                text: "Apply",
+                                onPressed: () async {
+                                  showLoading(context);
+                                  //wait 1 sec
+                                  await Future.delayed(Duration(seconds: 1));
+
+                                  hideLoading(context);
+                                  setState(() {});
+                                },
+                                prefixIcon: Icons.discount,
+                                bgColor: AppColors.primary,
+                                borderColor: Colors.transparent,
+                                textColor: AppColors.white,
+                                borderRadius: 10),
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 10,
+                      ),
                       // List of cart items
                       Container(
-                        height: getDeviceHeight(context) * 0.52,
+                        height: getDeviceHeight(context) * 0.48,
                         child: ListView.builder(
                           itemCount: provider.printCartList!.length,
                           itemBuilder: (context, index) {
@@ -283,12 +287,12 @@ class _PrintCartViewState extends State<PrintCartView> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const Text(
-                                'Total Amount: ',
+                                'Total Amount after discount: ',
                                 style: TextStyle(
                                     fontSize: 12, fontWeight: FontWeight.bold),
                               ),
                               Text(
-                                "₹${getTotalAmount(provider).toStringAsFixed(2)}",
+                                "₹${getTotalAmount(provider, int.parse(discountController.text == "" ? "0" : discountController.text)).toStringAsFixed(2)}",
                                 style: const TextStyle(
                                     color: AppColors.primary,
                                     fontSize: 12,

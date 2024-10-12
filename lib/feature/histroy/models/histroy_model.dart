@@ -3,18 +3,16 @@ import 'dart:convert';
 
 import 'package:print_app/feature/print_cart/models/print_cart_model.dart';
 
+//  'print_cart': print_cart?.map((x) => x.toMap()).toList(),
 class HistroyModel {
   int? id;
   List<PrintCartModel>? print_cart;
   String? date;
   String? payment_mode;
+  int? discount;
 
-  HistroyModel({
-    this.id,
-    this.print_cart,
-    this.date,
-    this.payment_mode,
-  });
+  HistroyModel(
+      {this.id, this.print_cart, this.date, this.payment_mode, this.discount});
 
   Map<String, dynamic> toMap() {
     return <String, dynamic>{
@@ -22,6 +20,7 @@ class HistroyModel {
       'print_cart': print_cart?.map((x) => x.toMap()).toList(),
       'date': date,
       'payment_mode': payment_mode,
+      'discount': discount
     };
   }
 
@@ -38,6 +37,7 @@ class HistroyModel {
       date: map['date'] != null ? map['date'] as String : null,
       payment_mode:
           map['payment_mode'] != null ? map['payment_mode'] as String : null,
+      discount: map['discount'] != null ? map['discount'] as int : null,
     );
   }
 

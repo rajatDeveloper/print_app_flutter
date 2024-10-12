@@ -22,12 +22,19 @@ class _HistroyCardState extends State<HistroyCard> {
     return totalQuantity;
   }
 
-  double getTotalPrice() {
+  double getTotalPrice(int discount) {
     double totalPrice = 0;
+
+    // Calculate total price without discount
     for (var item in widget.model.print_cart!) {
       totalPrice += item.quantity! * double.parse(item.product!.price!);
     }
-    return totalPrice;
+
+    // Calculate the discount amount
+    double discountAmount = (totalPrice * discount) / 100;
+
+    // Return the total price after applying the discount
+    return totalPrice - discountAmount;
   }
 
   String formatDate(String dateString) {
@@ -44,7 +51,7 @@ class _HistroyCardState extends State<HistroyCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: AppColors.primary, width: 1),
@@ -66,8 +73,18 @@ class _HistroyCardState extends State<HistroyCard> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Total Quantity: ${getTotalQuantity()}"),
-              Text("₹${getTotalPrice()}")
+              const Text("Total Quantity:"),
+              Text("${getTotalQuantity()}")
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text("Total Amount (Discount ${widget.model.discount ?? "0"}%):"),
+              Text("₹${getTotalPrice(widget.model.discount ?? 0)}")
             ],
           ),
           showDetails

@@ -167,10 +167,13 @@ class MainProvider extends ChangeNotifier {
   Future<void> createHistoryData(
       {required BuildContext context,
       required List<int> printProductIds,
-      required String paymentMode}) async {
+      required String paymentMode,
+      required int discount}) async {
     try {
       var res = await _printCartService.createHistroyService(
-          printProduuctCartIds: printProductIds, payemtMode: paymentMode);
+          discount: discount,
+          printProduuctCartIds: printProductIds,
+          payemtMode: paymentMode);
 
       res.handleResponse(onSuccess: () async {
         getAllPrintCartData(context: context);
